@@ -3,6 +3,7 @@ package com.bereg.clientapp.presentation.presenter;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.bereg.clientapp.domain.ConnectionInteractor;
+import com.bereg.clientapp.models.MessageModel;
 import com.bereg.clientapp.presentation.view.WeatherView;
 
 import ru.terrakok.cicerone.Router;
@@ -26,8 +27,13 @@ public class WeatherPresenter extends MvpPresenter<WeatherView> implements Conne
     }
 
     @Override
-    public void onWeatherResultReady(String weatherResult) {
+    public void onWeatherResultReady(MessageModel weatherResult) {
 
         getViewState().showWeatherInfo(weatherResult);
+        mRouter.showSystemMessage(weatherResult.getMessage());
+    }
+
+    public void openScreen(String tag) {
+        mRouter.navigateTo(tag);
     }
 }

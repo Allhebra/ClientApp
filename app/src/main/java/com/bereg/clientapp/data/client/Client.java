@@ -3,11 +3,20 @@ package com.bereg.clientapp.data.client;
 import android.util.Log;
 
 import com.bereg.clientapp.data.core.Message;
+import com.bereg.clientapp.data.core.SenderType;
 import com.bereg.clientapp.data.core.communication.MessageReader;
 import com.bereg.clientapp.data.core.communication.MessageWriter;
+import com.bereg.clientapp.models.MessageModel;
+
+import org.joda.time.DateTime;
 
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 /**
  * Created by 1 on 09.03.2018.
@@ -21,7 +30,11 @@ public class Client {
     private final int port;
     private MessageReader reader;
     private MessageWriter writer;
-    private WeatherResultListener mWeatherResultListener;
+    private Observable<MessageModel> messagesObservable;
+    private MessageModel message;
+    //private boolean sessionRunningStatus = false;
+    private boolean sessionEndedStatus = false;
+    private boolean newMessageReady =false;
 
     public Client(String host, int port) throws Exception{
 
@@ -29,54 +42,95 @@ public class Client {
         this.port = port;
     }
 
+    public Observable<MessageModel> getMessagesObservable() {
+
+        messagesObservable = Observable.create(new ObservableOnSubscribe<MessageModel>() {
+            @Override
+            public void subscribe(ObservableEmitter<MessageModel> e) throws Exception {
+                Log.e(TAG, "subscribe:   ");
+                while (/*sessionRunningStatus && */!sessionEndedStatus) {
+                    if (newMessageReady/* && !message.equals(lastMsg)*/) {
+                        e.onNext(message);
+                        newMessageReady = false;
+                        Log.e(TAG, "observable.create:   " + message);
+                    }
+                }
+                e.onComplete();
+            }
+        });
+        return messagesObservable;
+    }
+
+    //TODO: check why throws "connection timed out" exception
     public void start() {
 
+        //sessionRunningStatus = true;
         try {
-            Log.e(TAG, "try");
-
             Socket socket = new Socket(this.host, this.port);
             reader = new MessageReader(socket.getInputStream());
             writer = new MessageWriter(socket.getOutputStream());
-
-            //Запуск логики приложения
-            this.logicStart();
-            //socket.close();
+            //start of communication logic
+            communicationProtocol();
+            socket.close();
         }catch (Exception e) {
             Log.e(TAG, "start:   " + e.toString());
         }
     }
 
-    private void logicStart() {
-        //Логика приложения
+    private void communicationProtocol() {
+
+        //logic of communication
         try {
             writer.writeMessage(Message.HELLO);
+            message = new MessageModel(SenderType.CLIENT, Message.HELLO, DateTime.now());
             Log.e(TAG, "writer:HELLO");
+            waitTillMessageEmitted();
 
             String msg = reader.readMessage();
-            Log.e(TAG, "reader:   " + msg);
+            message = new MessageModel(SenderType.SERVER, msg, DateTime.now());
+            Log.e(TAG, "reader:   " + message);
+            waitTillMessageEmitted();
+
             if (msg.equals(Message.HELLO)) {
                 Log.e(TAG, "if");
                 writer.writeMessage(Message.READY_REQUEST);
+                message = new MessageModel(SenderType.CLIENT, Message.READY_REQUEST, DateTime.now());
                 Log.e(TAG, "writer:READY_REQUEST");
+                waitTillMessageEmitted();
+
                 msg = reader.readMessage();
-                Log.e(TAG, "reader:   " + msg);
+                message = new MessageModel(SenderType.SERVER, msg, DateTime.now());
+                Log.e(TAG, "reader:   " + message);
+                waitTillMessageEmitted();
+
                 if (msg.equals(Message.READY_RESPONSE)) {
                     writer.writeMessage(Message.GET_INFORMATION);
+                    message = new MessageModel(SenderType.CLIENT, Message.GET_INFORMATION, DateTime.now());
                     Log.e(TAG, "writer:GET_INFORMATION");
-                    String weatherResult = reader.readMessage();
-                    mWeatherResultListener.onWeatherResultReady(weatherResult);
+                    waitTillMessageEmitted();
+
+                    msg = reader.readMessage();
+                    message = new MessageModel(SenderType.SERVER, msg, DateTime.now());
+                    Log.e(TAG, "reader:   " + message);
+                    waitTillMessageEmitted();
                 }
             }
+            sessionEndedStatus = true;
         }catch (Exception e) {
-            Log.e(TAG, "logicStart:   " + e.toString());
+            Log.e(TAG, "communicationProtocol:   " + e.toString());
         }
     }
 
-    public void setWeatherResultListener(WeatherResultListener resultListener) {
-        mWeatherResultListener = resultListener;
-    }
+    private void waitTillMessageEmitted() {
 
-    public interface WeatherResultListener {
-        void onWeatherResultReady(String weatherResult);
+        newMessageReady = true;
+        while (newMessageReady) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+                Log.e(TAG, "waitTillMessageEmitted");
+            } catch (Exception e) {
+                Log.e(TAG, "waitTillMessageEmitted:   " + e.toString());
+            }
+        }
     }
 }

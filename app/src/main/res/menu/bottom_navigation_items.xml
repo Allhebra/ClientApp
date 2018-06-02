@@ -6,12 +6,12 @@
         android:icon="@drawable/ic_update_black_24dp"
         android:title="@string/update"/>
     <item
-        android:id="@+id/action_item2"
+        android:id="@+id/action_settings"
         android:icon="@drawable/ic_update_black_24dp"
-        android:title="@string/update"/>
+        android:title="@string/settings"/>
     <item
-        android:id="@+id/action_item3"
+        android:id="@+id/action_logs"
         android:icon="@drawable/ic_update_black_24dp"
-        android:title="@string/update"/>
+        android:title="@string/logs"/>
 
 </menu>

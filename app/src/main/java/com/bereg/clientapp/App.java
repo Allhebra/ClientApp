@@ -7,6 +7,8 @@ import com.bereg.clientapp.di.AppComponent;
 import com.bereg.clientapp.di.AppModule;
 import com.bereg.clientapp.di.DaggerAppComponent;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import ru.terrakok.cicerone.Cicerone;
 import ru.terrakok.cicerone.NavigatorHolder;
 import ru.terrakok.cicerone.Router;
@@ -35,6 +37,7 @@ public class App extends Application {
         //.appModule(new AppModule(getApplicationContext()))
         //.build();
         cicerone = Cicerone.create();
+        JodaTimeAndroid.init(this);
         Log.e(TAG, String.valueOf(appComponent) + String.valueOf(cicerone));
     }
 

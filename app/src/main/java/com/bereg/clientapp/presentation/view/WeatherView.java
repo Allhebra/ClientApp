@@ -1,6 +1,7 @@
 package com.bereg.clientapp.presentation.view;
 
 import com.arellomobile.mvp.MvpView;
+import com.bereg.clientapp.models.MessageModel;
 
 /**
  * Created by 1 on 11.03.2018.
@@ -8,5 +9,5 @@ import com.arellomobile.mvp.MvpView;
 
 public interface WeatherView extends MvpView {
 
-    void showWeatherInfo(String weatherInfo);
+    void showWeatherInfo(MessageModel weatherInfo);
 }

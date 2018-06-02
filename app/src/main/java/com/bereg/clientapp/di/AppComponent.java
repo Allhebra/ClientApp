@@ -1,5 +1,6 @@
 package com.bereg.clientapp.di;
 
+import com.bereg.clientapp.data.InMemoryCacheManager;
 import com.bereg.clientapp.domain.ConnectionInteractor;
 import com.bereg.clientapp.presentation.presenter.MainPresenter;
 
@@ -15,6 +16,6 @@ import dagger.Component;
 @Component(modules = {AppModule.class})
 public interface AppComponent {
 
-    MainPresenter getMainPresenter();
     ConnectionInteractor getConnectionInteractor();
+    InMemoryCacheManager getInMemoryCacheManager();
 }

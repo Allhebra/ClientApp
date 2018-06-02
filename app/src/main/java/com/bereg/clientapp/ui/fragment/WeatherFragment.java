@@ -1,8 +1,11 @@
 package com.bereg.clientapp.ui.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -12,7 +15,9 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.bereg.clientapp.App;
 import com.bereg.clientapp.R;
+import com.bereg.clientapp.Utils.Screens;
 import com.bereg.clientapp.domain.ConnectionInteractor;
+import com.bereg.clientapp.models.MessageModel;
 import com.bereg.clientapp.presentation.presenter.WeatherPresenter;
 import com.bereg.clientapp.presentation.view.WeatherView;
 
@@ -32,7 +37,7 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
     TextView weatherResult;
 
     @InjectPresenter
-    WeatherPresenter mInfoPresenter;
+    WeatherPresenter mWeatherPresenter;
 
     @ProvidePresenter
     WeatherPresenter provideInfoPresenter() {
@@ -55,7 +60,6 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -67,8 +71,32 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
     }
 
     @Override
-    public void showWeatherInfo(String weatherInfo) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.navigation);
 
-        weatherResult.setText(weatherInfo);
+        bottomNavigationView.setOnNavigationItemSelectedListener
+                (new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_update:
+                                break;
+                            case R.id.action_settings:
+                                mWeatherPresenter.openScreen(Screens.SETTINGS_SCREEN);
+                                break;
+                            case R.id.action_logs:
+                                mWeatherPresenter.openScreen(Screens.LOGS_SCREEN);
+                                break;
+                        }
+                        return true;
+                    }
+                });
+    }
+
+    @Override
+    public void showWeatherInfo(MessageModel weatherInfo) {
+
+        weatherResult.setText(weatherInfo.getMessage());
     }
 }

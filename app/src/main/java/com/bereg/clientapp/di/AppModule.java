@@ -3,6 +3,8 @@ package com.bereg.clientapp.di;
 import android.content.Context;
 
 import com.bereg.clientapp.App;
+import com.bereg.clientapp.data.InMemoryCacheManager;
+import com.bereg.clientapp.data.SharedPreferencesManager;
 import com.bereg.clientapp.domain.ConnectionInteractor;
 import com.bereg.clientapp.presentation.presenter.MainPresenter;
 
@@ -26,13 +28,25 @@ public class AppModule {
     }
     @Provides
     @Singleton
-    ConnectionInteractor provideConnectionInteractor() {
-        return new ConnectionInteractor();
+    ConnectionInteractor provideConnectionInteractor(SharedPreferencesManager sharedPreferencesManager, InMemoryCacheManager inMemoryCacheManager) {
+        return new ConnectionInteractor(sharedPreferencesManager, inMemoryCacheManager);
     }
 
     @Provides
     @Singleton
     Router provideRouter() {
         return App.getInstance().getRouter();
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferencesManager provideSharedPreferencesManager() {
+        return new SharedPreferencesManager();
+    }
+
+    @Provides
+    @Singleton
+    InMemoryCacheManager provideInMemoryCacheManager() {
+        return new InMemoryCacheManager();
     }
 }

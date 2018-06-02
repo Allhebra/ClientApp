@@ -5,7 +5,14 @@
     <string name="come_in">Войти</string>
 
     <string name="update">Обновить ПО</string>
+    <string name="settings">Настройки</string>
+    <string name="logs">Логи</string>
+    <string name="favorite">Избранное</string>
 
+    <string name="server_address_summary">Задайте адрес сервера</string>
+    <string name="server_address_title">Адрес сервера</string>
+    <string name="server_port_summary">Задайте порт сервера</string>
+    <string name="server_port_title">Порт сервера</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
