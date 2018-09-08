@@ -40,6 +40,13 @@ public class MainPresenter extends MvpPresenter<MainView> implements ConnectionI
         }
     }
 
+    public void onAirplaneModeChanged(boolean airplaneMode) {
+
+        if (airplaneMode) {
+            mRouter.showSystemMessage("AirplaneMode turned on!");
+        }
+    }
+
     @Override
     public void onWeatherResultReady(MessageModel weatherResult) {
 

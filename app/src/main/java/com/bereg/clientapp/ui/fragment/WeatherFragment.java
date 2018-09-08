@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,9 +18,14 @@ import com.bereg.clientapp.App;
 import com.bereg.clientapp.R;
 import com.bereg.clientapp.Utils.Screens;
 import com.bereg.clientapp.domain.ConnectionInteractor;
-import com.bereg.clientapp.models.MessageModel;
+import com.bereg.clientapp.models.WeatherResultModel;
 import com.bereg.clientapp.presentation.presenter.WeatherPresenter;
 import com.bereg.clientapp.presentation.view.WeatherView;
+import com.bereg.clientapp.ui.adapters.CarouselAdapter;
+import com.bereg.clientapp.ui.adapters.WeatherCarousel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,8 +39,14 @@ import ru.terrakok.cicerone.Router;
 
 public class WeatherFragment extends MvpAppCompatFragment implements WeatherView {
 
-    @BindView(R.id.tv_weather_result)
-    TextView weatherResult;
+    private static final String TAG = WeatherFragment.class.getSimpleName();
+
+    WeatherCarousel mWeatherCarousel;
+    CarouselAdapter mCarouselAdapter;
+    List<WeatherResultModel> weatherResultModels = new ArrayList<>();
+
+    /*@BindView(R.id.tv_weather_result)
+    TextView weatherResult;*/
 
     @InjectPresenter
     WeatherPresenter mWeatherPresenter;
@@ -92,11 +104,18 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
                         return true;
                     }
                 });
+
+        mWeatherCarousel = view.findViewById(R.id.weather_carousel);
+        mCarouselAdapter = new CarouselAdapter(getContext(), weatherResultModels);
+        mWeatherCarousel.setAdapter(mCarouselAdapter);
     }
 
     @Override
-    public void showWeatherInfo(MessageModel weatherInfo) {
+    public void showWeatherInfo(WeatherResultModel weatherResultModel) {
 
-        weatherResult.setText(weatherInfo.getMessage());
+        Log.e(TAG, "showWeatherInfo:   " + weatherResultModel.getTimestamp());
+        //weatherResult.setText(weatherResultModel.getTemp().toString());
+        weatherResultModels.add(weatherResultModel);
+        mCarouselAdapter.notifyDataSetChanged();
     }
 }

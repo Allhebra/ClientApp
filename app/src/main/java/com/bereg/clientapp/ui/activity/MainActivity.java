@@ -1,7 +1,13 @@
 package com.bereg.clientapp.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -37,6 +43,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     @BindView(R.id.btn_come_in)
     Button comeInButton;
 
+    //AlertDialog.Builder mAlertBuilder = new AlertDialog.Builder(this);
+
     @InjectPresenter
     MainPresenter mMainPresenter;
 
@@ -71,6 +79,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
             Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
         }
 
+        /*protected void showAlert(String message) {
+            mAlertBuilder.setMessage(message).create().show();
+        }*/
+
         @Override
         protected void exit() {
             finish();
@@ -89,8 +101,17 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     protected void onResume() {
         super.onResume();
         App.getInstance().getNavigatorHolder().setNavigator(navigator);
+        BroadcastReceiver br = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mMainPresenter.onAirplaneModeChanged(intent.getBooleanExtra("state", false));
+            }
+        };
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        this.registerReceiver(br, filter);
         Log.e(TAG, "onResume");
-        Toast.makeText(MainActivity.this, "ActivityOnResume", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "ActivityOnResume", Toast.LENGTH_LONG).show();
     }
 
     @Override

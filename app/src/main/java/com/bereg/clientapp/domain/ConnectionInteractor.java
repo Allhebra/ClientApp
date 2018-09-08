@@ -43,11 +43,11 @@ public class ConnectionInteractor implements Runnable {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<MessageModel>() {
                         @Override
-                        public void accept(MessageModel string) throws Exception {
-                            Log.e(TAG, "accept:   " + string);
-                            mInMemoryCacheManager.addMessageToMemoryCache(string);
-                            if (string.getMessage().contains(Message.TEMPLATE)) {  //TODO: bad place, need to change. See Message class.
-                                mWeatherResultListener.onWeatherResultReady(string);
+                        public void accept(MessageModel model) throws Exception {
+                            Log.e(TAG, "accept:   " + model);
+                            mInMemoryCacheManager.addMessageToMemoryCache(model);
+                            if (model.getMessage().contains(Message.TEMPLATE)) {  //TODO: bad place, need to change. See Message class.
+                                mWeatherResultListener.onWeatherResultReady(model);
                             }
                         }
                     });
